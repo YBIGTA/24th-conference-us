@@ -45,6 +45,7 @@ async def test_s3(file_key: str):
         
         # Download the file from S3
         download_from_s3(file_location, settings.S3_BUCKET_NAME, file_key)
+        ### 이 사이에 피처 익스트랙터들 넣을거임###
         
         # Return a success message
         return {"message": f"File {file_key} downloaded successfully to {file_location}"}
