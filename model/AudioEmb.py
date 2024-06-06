@@ -83,4 +83,4 @@ def feature_ext(audiofile, stt):
     # final.shape : (40,)
     return final 
 
-print(feature_ext(input()))
+print(feature_ext(input(), input()))
