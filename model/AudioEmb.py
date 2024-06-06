@@ -15,11 +15,11 @@ def M4A2WAV(file):
     final = track.export(file[:-3] + 'wav', format='wav')
     return final
 
-def feature_ext(audiofile):
+def feature_ext(audiofile, stt):
     """
     audio embedding vector를 만드는 함수 
     input : audiofile (.mp3, .m4a, .wav)
-    output : (39,) np.array(or torch.tensor)
+    output : (40,) np.array(or torch.tensor)
     """
     
     # audio format to WAV
@@ -68,14 +68,17 @@ def feature_ext(audiofile):
     F_Q2 = np.quantile(Fourier, q=0.5)
     F_Q3 = np.quantile(Fourier, q=0.75)
     
+    # Speeching speed
+    SS = len(stt.split(' ')) / (len(y)/sr)
+    
     final = np.array([zcr, spr_mean, spr_var, spc_mean, spc_var, harm_mean, 
                      harm_var, perc_mean, perc_var, F_var, F_mean, F_dif,
-                     F_Q1, F_Q2, F_Q3])
+                     F_Q1, F_Q2, F_Q3, SS])
     final = np.append(final, chr_mean)
     final = np.append(final, chr_var)
     
     # if torch
     # final = torch.Tensor(final)
     
-    # final.shape : (39,)
+    # final.shape : (40,)
     return final 
