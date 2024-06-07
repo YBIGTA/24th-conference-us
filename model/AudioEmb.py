@@ -18,7 +18,7 @@ def M4A2WAV(file):
 def feature_ext(audiofile, stt):
     """
     audio embedding vector를 만드는 함수 
-    input : audiofile (.mp3, .m4a, .wav)
+    input : audiofile (.mp3, .m4a, .dwav)
     output : (40,) np.array(or torch.tensor)
     """
     
