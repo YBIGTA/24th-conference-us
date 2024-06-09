@@ -12,6 +12,7 @@ def softmax(a):
 
 def pos(snt):
     m = Mecab()
+    #m = Mecab(dicpath='/usr/local/lib/mecab/dic/mecab-ko-dic')
     sts = m.pos(snt)
 
     lst = []
@@ -26,6 +27,5 @@ def pos(snt):
     # if torch
     # fin = torch.Tensor(fin)
     
-    return print(fin)
+    return fin
 
-pos(input())
