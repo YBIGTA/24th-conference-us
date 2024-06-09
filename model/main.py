@@ -4,7 +4,10 @@ import os
 import sys
 from config import settings
 
-from feature import feature_extraction
+from AudioEmb import feature_ext
+from pos import pos
+from sbert_embedding import sbert_embedding
+from whisper_stt import whisper_stt
 
 app = FastAPI()
 
