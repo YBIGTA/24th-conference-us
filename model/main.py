@@ -5,6 +5,7 @@ import sys
 from config import settings
 from http import HTTPStatus
 import numpy as np
+from typing import Dict, Any, List
 
 from AudioEmb import feature_ext
 from pos import pos
@@ -13,7 +14,10 @@ from whisper_stt import transcribe_audio
 
 app = FastAPI()
 
-def get_s3_client():
+def get_s3_client() -> boto3.client:
+    """
+    S3 클라이언트를 생성합니다.
+    """
     return boto3.client(
         's3',
         aws_access_key_id=settings.S3_ACCESS_KEY,
@@ -21,17 +25,24 @@ def get_s3_client():
         region_name=settings.REGION
     )
 
-def download_from_s3(local_file_name, s3_bucket, s3_object_key):
+def download_from_s3(local_file_name: str, s3_bucket: str, s3_object_key: str) -> None:
+    """
+    S3 버킷에서 파일을 다운로드합니다.
+
+    :param local_file_name: 로컬에 저장할 파일 경로
+    :param s3_bucket: S3 버킷 이름
+    :param s3_object_key: S3 객체 키
+    """
     s3 = get_s3_client()
     meta_data = s3.head_object(Bucket=s3_bucket, Key=s3_object_key)
     total_length = int(meta_data.get('ContentLength', 0))
     downloaded = 0
 
-    def progress(chunk):
+    def progress(chunk: int) -> None:
         nonlocal downloaded
         downloaded += chunk
         done = int(50 * downloaded / total_length)
-        sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50-done)))
+        sys.stdout.write("\r[%s%s]" % ('=' * done, ' ' * (50 - done)))
         sys.stdout.flush()
 
     print(f'Downloading {s3_object_key}')
@@ -40,41 +51,47 @@ def download_from_s3(local_file_name, s3_bucket, s3_object_key):
     print(f'\nDownloaded {s3_object_key} to {local_file_name}')
 
 @app.get("/FAST/test_s3")
-async def test_s3(file_key: str):
+async def test_s3(file_key: str) -> Dict[str, Any]:
+    """
+    S3에서 파일을 다운로드하고, 오디오를 처리한 후 결과를 반환합니다.
+
+    :param file_key: S3 객체 키
+    :return: 처리된 결과와 상태 메시지
+    """
     try:
         # Define the local file path for saving the downloaded file
         local_directory = '/Users/daniel/Desktop/Us/data'
         if not os.path.exists(local_directory):
             os.makedirs(local_directory)
         file_location = os.path.join(local_directory, os.path.basename(file_key))
-        
+
         # Download the file from S3
         download_from_s3(file_location, settings.S3_BUCKET_NAME, file_key)
-        
+
         # Logging for debugging
         print("File downloaded successfully. Starting feature extraction...")
-        
+
         # Process the file
-        text = transcribe_audio(file_location)
+        text: str = transcribe_audio(file_location)
         print("Transcription completed.")
-        
-        audio_feature = feature_ext(file_location, text)
+
+        audio_feature: np.ndarray = feature_ext(file_location, text)
         print("Audio feature extraction completed.")
-        
-        pos_feature = pos(text)
+
+        pos_feature: List[Dict[str, Any]] = pos(text)
         print("POS feature extraction completed.")
-        
-        sbert_feature = sbert_embedding(text)
+
+        sbert_feature: np.ndarray = sbert_embedding(text)
         print("SBERT feature extraction completed.")
 
         # Delete the file after processing
         os.remove(file_location)
         os.remove(file_location[:-3] + 'wav')
 
-        result = {
+        result: Dict[str, Any] = {
             "audio_feature": audio_feature.tolist() if isinstance(audio_feature, np.ndarray) else audio_feature,
             "transcribed_text": text,
-            "pos_feature": pos_feature if isinstance(pos_feature, list) else list(pos_feature),
+            "pos_feature": pos_feature,
             "text_embedding": sbert_feature.tolist() if isinstance(sbert_feature, np.ndarray) else sbert_feature
         }
 
