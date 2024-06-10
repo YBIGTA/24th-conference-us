@@ -3,11 +3,13 @@ import boto3
 import os
 import sys
 from config import settings
+from http import HTTPStatus
+import numpy as np
 
 from AudioEmb import feature_ext
 from pos import pos
 from sbert_embedding import sbert_embedding
-from whisper_stt import whisper_stt
+from whisper_stt import transcribe_audio
 
 app = FastAPI()
 
@@ -48,10 +50,40 @@ async def test_s3(file_key: str):
         
         # Download the file from S3
         download_from_s3(file_location, settings.S3_BUCKET_NAME, file_key)
-        ### 이 사이에 피처 익스트랙터들 넣을거임###
         
-        # Return a success message
-        return {"message": f"File {file_key} downloaded successfully to {file_location}"}
+        # Logging for debugging
+        print("File downloaded successfully. Starting feature extraction...")
+        
+        # Process the file
+        text = transcribe_audio(file_location)
+        print("Transcription completed.")
+        
+        audio_feature = feature_ext(file_location, text)
+        print("Audio feature extraction completed.")
+        
+        pos_feature = pos(text)
+        print("POS feature extraction completed.")
+        
+        sbert_feature = sbert_embedding(text)
+        print("SBERT feature extraction completed.")
+
+        # Delete the file after processing
+        os.remove(file_location)
+        os.remove(file_location[:-3] + 'wav')
+
+        result = {
+            "audio_feature": audio_feature.tolist() if isinstance(audio_feature, np.ndarray) else audio_feature,
+            "transcribed_text": text,
+            "pos_feature": pos_feature if isinstance(pos_feature, list) else list(pos_feature),
+            "text_embedding": sbert_feature.tolist() if isinstance(sbert_feature, np.ndarray) else sbert_feature
+        }
+
+        # Return the result with HTTP status
+        return {
+            "status": HTTPStatus.OK,
+            "message": f"File {file_key} downloaded and processed successfully.",
+            "features": result
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

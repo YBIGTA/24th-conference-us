@@ -5,15 +5,10 @@ from whisper_stt import transcribe_audio
 
 file_location = '/Users/daniel/Desktop/Us/Us/STT/test.m4a'
 
-print('start')
 text = transcribe_audio(file_location)
-print('text', text)
 audio_feature = feature_ext(file_location, text)
-print('audio_feature', audio_feature)
 pos_feature = pos(text)
-print('pos_feature', pos_feature)
 sbert_feature = sbert_embedding(text)
-print('sbert_feature', sbert_feature)
 
 result = {
             "audio_feature": audio_feature.tolist(),  # assuming it's a numpy array
@@ -28,4 +23,3 @@ result = {
         #     "message": f"File {file_key} downloaded and processed successfully.",
         #     "features": result
         # }
-print(result)
