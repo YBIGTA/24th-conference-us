@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 import boto3
 import os
 import sys
-from config import settings
+from config_1 import settings
 from http import HTTPStatus
 import numpy as np
 
