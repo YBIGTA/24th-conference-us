@@ -18,7 +18,7 @@ MarkupSafe==2.1.5
 mecab-python
 mpmath==1.3.0
 msgpack==1.0.8
-networkx==3.3
+networkx==3.2.1
 numba==0.59.1
 numpy==1.26.4
 packaging==24.0
@@ -42,3 +42,6 @@ typing_extensions==4.12.1
 transformers==4.41.2
 urllib3==2.2.1
 ffmpeg-python
+fastapi==0.70.0
+uvicorn==0.15.0
+boto3
