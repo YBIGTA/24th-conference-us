@@ -7,6 +7,10 @@
 
 ## 프로젝트 구조도
 <img width="758" alt="image" src="https://github.com/Uarth/Us/assets/87052350/a10b8b78-f2bc-4a76-ac29-8f97fe3ad80a">
+1. 유저가 UI에서 가입 및기 본 정보 입력 -> User DB
+2. 유저가 UI에서 녹음 실행 -> FastAPI로 이동해서 Feature 추출, Feature DB서버에 저장
+3. 매칭시, Feature들을 불러와 Rule Based로 만든 후, 둘의 음성 녹음을 기반으로 LLM Enhanced Explain
+
 
 ### 유저 화면 예시 
 <img width="855" alt="image" src="https://github.com/Uarth/Us/assets/87052350/b5f94b1f-0764-48c5-85d3-d0e0df988e91">
