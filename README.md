@@ -9,5 +9,6 @@
 <img width="758" alt="image" src="https://github.com/Uarth/Us/assets/87052350/a10b8b78-f2bc-4a76-ac29-8f97fe3ad80a">
 
 ### 유저 화면 예시 
-![image](https://github.com/Uarth/Us/assets/87052350/0e5571cc-7f71-443c-9b18-b8b46791f57b)
+<img width="855" alt="image" src="https://github.com/Uarth/Us/assets/87052350/b5f94b1f-0764-48c5-85d3-d0e0df988e91">
+<img width="859" alt="image" src="https://github.com/Uarth/Us/assets/87052350/39e7d613-c37b-4997-9b7d-858a4e8e0693">
 
