@@ -4,7 +4,7 @@ from langchain.chains import LLMChain
 
 
 def Clean_Text(raw):
-    openai_api_key = "sk-proj-HNMrLC5SL9il4okFNe2iT3BlbkFJUurTD1wsM4s4DI8HnMOX"
+    openai_api_key = ""
     llm = ChatOpenAI(api_key=openai_api_key, model_name="gpt-4")
 
     cleaning_prompt_template = PromptTemplate(
