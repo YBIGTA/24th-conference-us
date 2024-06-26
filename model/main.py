@@ -15,6 +15,7 @@ from AudioEmb import feature_ext
 from pos import pos
 from sbert_embedding import sbert_embedding
 from whisper_stt import transcribe_audio
+from Clean_Text import Clean_Text
 
 app = FastAPI()
 
@@ -63,6 +64,7 @@ async def test_s3(file_url: str = Query(..., description="S3 file URL")) -> JSON
         print("File downloaded successfully. Starting feature extraction...")
 
         text: str = transcribe_audio(file_location)
+        text = Clean_Text(text)
         print("Transcription completed.")
 
         audio_feature: np.ndarray = feature_ext(file_location, text)
