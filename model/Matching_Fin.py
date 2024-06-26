@@ -2,13 +2,10 @@ import json
 import numpy as np
 import pandas as pd
 import pymysql
-import os
-from datetime import datetime
-import pickle
 import ast
 from scipy.spatial.distance import cosine
-import Explain_Match 
-
+import Explain_Match
+import logging
 
 # open DB config file and connect to DB
 with open('./config_db.json', 'r', encoding='UTF8') as j:
@@ -35,12 +32,7 @@ def download_table(table_name):
     table = pd.DataFrame(table, columns=columns)
     return table
 
-# (variable) feature data of Requester 
-with open('zioni.p', 'rb') as file:   
-    zioni = pickle.load(file)
-
-
-def Matching(Requester):
+def Matching(userid):
     # table download
     user = download_table('user')
     user = user.drop(index=0)
@@ -56,11 +48,22 @@ def Matching(Requester):
     for tab in tables:
         for col in columns:
             tab[col] = tab[col].apply(lambda x: np.array(ast.literal_eval(x)))
-        
+    requester_name = user[user['id'] == int(userid)]['name'].values[0]
+    requester_data = []
+    for tab in tables:
+        audio_feature = tab[tab['user_id'] == int(userid)]['audio_feature'].values
+        pos = tab[tab['user_id'] == int(userid)]['pos'].values
+        emb_text = tab[tab['user_id'] == int(userid)]['emb_text'].values
+        if len(audio_feature) > 0 and len(pos) > 0 and len(emb_text) > 0:
+            requester_data.append([audio_feature[0], pos[0], emb_text[0]])
+        else:
+            logging.error(f"No data found for userid: {userid}")
+            raise ValueError("User data is incomplete or missing")    
     # calculate cosine similarity
-    for i, tab in zip(range(3), tables):
-        for j, col in zip([0, 1, 3], columns):
-            tab[col] = tab[col].apply(lambda x: cosine(x, np.array(Requester[i][j])))
+    
+    for i, tab in enumerate(tables):
+        for j, col in enumerate(columns):
+            tab[col] = tab[col].apply(lambda x: cosine(x, requester_data[i][j]))
     
     # calculate mean of cosine similarity
     for tab in tables:
@@ -84,12 +87,12 @@ def Matching(Requester):
 
     User2 = [name, Q1_ans, Q2_ans, Q3_ans]
     
-    # to be set 
-    User1 = ['정지원', Requester[0][2], Requester[1][2], Requester[2][2]]
+    U1_Q1_ans = Q1[Q1['user_id'] == int(userid)]['trans_text'].values[0]
+    U1_Q2_ans = Q2[Q2['user_id'] == int(userid)]['trans_text'].values[0]
+    U1_Q3_ans = Q3[Q3['user_id'] == int(userid)]['trans_text'].values[0]
+    
+    User1 = [requester_name, U1_Q1_ans, U1_Q2_ans, U1_Q3_ans]
     
     explain = Explain_Match.Explain_Rec(User1, User2)
     
-    return [Matched_id, explain]
-
-
-Matching(zioni)
+    return Matched_id, explain
