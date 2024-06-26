@@ -9,12 +9,15 @@ from http import HTTPStatus
 import numpy as np
 from typing import Dict, Any, List
 from urllib.parse import urlparse
+import logging
+
 
 from config_1 import settings
 from AudioEmb import feature_ext
 from pos import pos
 from sbert_embedding import sbert_embedding
 from whisper_stt import transcribe_audio
+from Matching_Fin import Matching
 from Clean_Text import Clean_Text
 
 app = FastAPI()
@@ -64,8 +67,9 @@ async def test_s3(file_url: str = Query(..., description="S3 file URL")) -> JSON
         print("File downloaded successfully. Starting feature extraction...")
 
         text: str = transcribe_audio(file_location)
-        text = Clean_Text(text)
         print("Transcription completed.")
+
+        text = Clean_Text(text)
 
         audio_feature: np.ndarray = feature_ext(file_location, text)
         print("Audio feature extraction completed.")
@@ -98,6 +102,34 @@ async def test_s3(file_url: str = Query(..., description="S3 file URL")) -> JSON
         print("Error: ", str(e))
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/FAST/matching")
+async def matching(userid: str = Query(..., description="UserID")) -> JSONResponse:
+    try:
+        UserID, Explain = Matching(userid)
+        
+        result = {UserID, 
+                    Explain}
+            
+        
+
+        response_content = {
+            "status": HTTPStatus.OK,
+            "message": f"matching successfully.",
+            "userid": UserID,
+            "Explain": Explain
+        }
+
+        return JSONResponse(content=jsonable_encoder(response_content))
+    
+    except Exception as e:
+        print("Error: ", str(e))
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+        
+        
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
