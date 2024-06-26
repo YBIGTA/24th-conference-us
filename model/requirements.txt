@@ -52,4 +52,5 @@ transformers
 sentence-transformers
 faiss-cpu
 pandas
+pymysql
 
