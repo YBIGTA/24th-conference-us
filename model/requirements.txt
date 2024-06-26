@@ -51,4 +51,5 @@ langchain-openai
 transformers
 sentence-transformers
 faiss-cpu
+pandas
 
