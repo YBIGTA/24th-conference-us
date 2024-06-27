@@ -53,11 +53,7 @@
 
 4. **모델링/아키텍쳐 등** *(프로젝트 특성 및 목표에 따라)*
     - (Models)
-        - Rule Based Recommendation System
-          - 
     - (Service Architecture)
-        - (Description)
-
 ## 결과 및 주요 기능
 
 *음성을 녹음한 후, 답변의 내용과 보이스 특성을 기반으로 사람을 매칭*
