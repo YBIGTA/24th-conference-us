@@ -54,7 +54,7 @@
         - 학회원님들께 감사드립니다! 
 
 4. **🗃️ 모델링/아키텍쳐 등** *(프로젝트 특성 및 목표에 따라)*
-    - (Models)
+    - <img width="1089" alt="Screenshot 2024-06-28 at 1 16 48 AM" src="https://github.com/Uarth/Us/assets/138357845/211e6969-dd8b-4758-aac1-8791ad837f43">
     - (Service Architecture)
 ## 🖥️ 결과 및 주요 기능
 
