@@ -60,8 +60,12 @@
         - 학회원님들께 감사드립니다! 
 
 4. **🗃️ 모델링/아키텍쳐 등** *(프로젝트 특성 및 목표에 따라)*
-    - <img width="1089" alt="Screenshot 2024-06-28 at 1 16 48 AM" src="https://github.com/Uarth/Us/assets/138357845/211e6969-dd8b-4758-aac1-8791ad837f43">
-    - (Service Architecture)
+    - 모델
+      <img width="1089" alt="Screenshot 2024-06-28 at 1 16 48 AM" src="https://github.com/Uarth/Us/assets/138357845/211e6969-dd8b-4758-aac1-8791ad837f43">
+    - 서비스 아키텍쳐
+      ![image](https://github.com/Uarth/Us/assets/138357845/1523a789-6e5c-4145-a309-bf951b8b8712)
+
+
 ## 🖥️ 결과 및 주요 기능
 
 *📍음성을 녹음한 후, 답변의 내용과 보이스 특성을 기반으로 사람을 매칭*
