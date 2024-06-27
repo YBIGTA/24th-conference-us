@@ -1,4 +1,4 @@
-# Us
+# 최적의 대화 상대 제공, Us입니다.
 
 <div align="center">
 <h3>24-1 YBIGTA 컨퍼런스</h3>
