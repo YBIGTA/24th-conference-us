@@ -1,0 +1,84 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CD with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: make database and aws properties
+      run: |
+        cd ./src/main/resources
+        touch database.properties
+        echo "${{secrets.DATABASE_PROPERTIES}}" >> database.properties
+        touch aws.properties
+        echo "${{secrets.AWS_PROPERTIES}}" >> aws.properties
+
+    - name: write env file
+      run: |
+        cd ./
+        touch .env
+        echo "${{secrets.ENV}}" >> .env
+        cd ./src/main/resources
+        touch .env
+        echo "${{secrets.ENV}}" >> .env
+        
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew build -x test
+        
+    - name: make application-prod.yml
+      run: |
+        cd ./src/main/resources
+        touch ./application-prod.yml
+        echo "${{secrets.EC2_HOST}}" > ./application-prod.yml
+
+    - name: Docker build
+      run: |
+        docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+        docker build -t app .
+        docker tag app ${{secrets.DOCKER_USERNAME}}/app:latest
+        docker push ${{secrets.DOCKER_USERNAME}}/app:latest
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{secrets.EC2_HOST}}
+        username: ${{secrets.EC2_USER_NAME}}
+        key: ${{secrets.PRIVATE_KEY}}
+        script: |
+          docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+          docker pull ${{secrets.DOCKER_USERNAME}}/app:latest
+          docker stop $(docker ps -a -q)
+          docker rm $(docker ps -a -q)
+          docker run -d -p 8080:8080 \
+            -e SPRING_PROPERTIES_ACTIVE=prod \
+            -e AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} \
+            -e AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} \
+            ${{secrets.DOCKER_USERNAME}}/app:latest
+          docker image prune -a -f
